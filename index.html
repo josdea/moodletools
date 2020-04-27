@@ -5,23 +5,21 @@
   <meta charset="UTF-8">
   <title>Moodle Bulk Upload Enroll Unenroll Tool</title>
 
-
   <link rel='stylesheet prefetch'
     href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'>
-
   <!-- <link rel="stylesheet" href="css/style.css"> -->
   <script src="js/ga.js"></script>
   <style>
     div#xmlOutput,
     .scroll {
       width: 100%;
-      height: 200px;
+      height: 400px;
       word-wrap: break-word;
       overflow-y: scroll;
     }
 
     input {
-      width: 95%;
+      /* width: 95%; */
     }
 
     #dwn-unenroll-csv,
@@ -35,64 +33,61 @@
   <div class="container" id="app">
     <h1>{{appTitle}}</h1>
     <hr>
-    <p><small>separate all values on new lines</small></p>
     <div class="row">
       <div class="col-sm-4">
         <label for="emails">Emails:</label>
-        <textarea id="emails" v-model="emails" class="form-control" rows="5"
-          placeholder="Emails go here separated by new lines, these will become the usernames as well"></textarea>
+        <textarea id="emails" v-model="emails" class="form-control" rows="6"
+placeholder="noreply@demo.com
+noreply2@demo.com
+          
+Separate emails with new lines, these will become the usernames as well. 
+Automatically converted to lower case."></textarea>
         <label for="names">Names:</label>
         <textarea id="names" v-model="names" class="form-control" rows="5"
-          placeholder="Names go here separated by new lines. (Last,First or First Last with a space)"></textarea>
-        <hr>
-        <label for="password">Password:</label>
-        <input id="password" v-model="password" placeholder="password to be applied to all users">
+placeholder="Separate first and last names with a space or comma.
 
-        <label for="description">Description (optional):</label>
-        <input id="description" v-model="description" placeholder="Description to be applied to all users">
-        <label for="role">Role (only needed for enroll):</label>
-        <input id="role" v-model="role" placeholder="Role Name (ex. Learner, Student, or Teacher">
+First name Last Name
+Last Name, First Name"></textarea>
+         <input type="checkbox" id="capital" v-model="capitalFirstLetter">
+        <label for="capital">Capitalize First Letter of first and last name</label>
+        <hr>
+        <label for="password" class="d-block">Password:</label>
+        <input id="password" v-model="password" class="w-100" placeholder="password applied to all users">
+        <label for="description" class="d-block">Description (optional):</label>
+        <input id="description" v-model="description" class="w-100" placeholder="description pplied to all users">
 
         <!-- <label for="userids">User Org ID Numbers (optional):</label>
         <textarea id="userids" class="form-control" rows="5"
           placeholder="User Org ID go here separated by new lines"></textarea> -->
-
         <label for="courseIds">Course Short Names</label>
         <textarea id="courseIds" v-model="courses" class="form-control" rows="5"
-          placeholder="Courses to enroll or unenroll all users, separated on a new line"></textarea>
-      </div>
+placeholder="course1-short-name
+course2-short-name
 
+Courses to enroll all users, separated on a new line"></textarea>
+        <label for="role" class="d-block">Role:</label>
+        <input id="role" v-model="role" class="w-100" placeholder="Role Name (ex. Learner, Student, or Teacher)">
+      </div>
       <div class="col-sm-8">
         <label for="enrollOutput">Enroll (click to select all):</label>
         <div class="scroll" id="enrollOutput">{{enrolldisplay}}</div><br>
         <input v-on:click="downCSV" type="button" id="dwn-enroll-csv" value="Download enroll.csv" />
-
-        <hr />
-        <label for="unenrollOutput">Unenroll (click to select all):</label>
-        <div class="scroll" id="unenrollOutput">
-          <div>
-            <div></div>
-          </div>
-        </div><br>
-        <input v-on:click="downCSV" type="btn button" id="download-csv" value="Download Enroll.csv" />
       </div>
     </div>
   </div>
-
-  <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js'></script> -->
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-
   <script>
     var app6 = new Vue({
       el: "#app",
       data: {
         appTitle: "Moodle Bulk Upload and Enroll",
-        emails: "josdea@gmail\nBobJones@gmail.com",
-        names: "dean, josh\nbob jones",
-        password: "123",
-        description: "none",
-        role: "Learner",
-        courses: "joshsandbox1\njoshsandbox2"
+        emails: "",
+        names: "",
+        password: "",
+        description: "",
+        role: "",
+        courses: "",
+        capitalFirstLetter: true
       },
       computed: {
         csvOutput: function () {
@@ -102,79 +97,87 @@
           return this.previewLoop();
         },
         enrolldisplay: function () {
-          
+
           return this.csvOutput()
         },
-        usertest: function(){
+        usertest: function () {
           return this.userList()//delete TODO
         }
       },
       methods: {
-
-        csvOutput: function(){
+        csvOutput: function () {
           let csv = []
           let csvRow = []
-
-          let arrEmails = this.emails.split("\n")
+          let arrEmails = this.emails.toLowerCase().split("\n")
           let arrUserList = this.userList()
           let arrCourseList = this.courses.split("\n")
           let enrollList = ""
-
+          let firstName = ""
+          let lastName = ""
           csvRow.push("username", "password", "firstname", "lastname", "description", "email")
-
-          arrCourseList.forEach((course,indexCourse) => {
-              csvRow.push("course"+(indexCourse+1),"role"+(indexCourse+1))
-            });
-
-            csv.push(csvRow.toString())
-            csvRow = []
-
+          
+          if(this.courses != ""){
+          arrCourseList.forEach((course, indexCourse) => {
+            csvRow.push("course" + (indexCourse + 1), "role" + (indexCourse + 1))
+          });
+          }
+          csv.push(csvRow.toString())
+          csvRow = []
+          if(this.emails != ""){
           arrEmails.forEach((email, indexEmail) => {
-            csvRow.push(email, this.password, arrUserList[indexEmail].first_name, arrUserList[indexEmail].last_name, this.description, email)
-
-            arrCourseList.forEach((course,indexCourse) => {
+            if(this.names != ""){
+            if (this.capitalFirstLetter === true) {
+              firstName = arrUserList[indexEmail].first_name
+              firstName = firstName[0].toUpperCase() + firstName.slice(1)
+              lastName = arrUserList[indexEmail].last_name
+              lastName = lastName[0].toUpperCase() + lastName.slice(1)
+            } else {
+              firstName = arrUserList[indexEmail].first_name
+              lastName = arrUserList[indexEmail].last_name
+            }
+            }
+            csvRow.push(email, this.password, firstName, lastName, this.description, email)
+            if(this.courses != ""){
+            arrCourseList.forEach((course, indexCourse) => {
               csvRow.push(course, this.role)
             });
-
-            // console.log(email + " -" + index)
+            }
             csv.push(csvRow.toString())
             csvRow = []
           });
+          }
           return csv.join('\n')
-
         },
-        userList: function() {
-      let splitusers = [];
+        userList: function () {
+          let splitusers = [];
+          let userlist = this.names.split("\n"); //splits text area by line
+          userlist.forEach(function (item, index) {
+            if (item != "") {
+              //if each line item isn't blank
+              userlist.splice(index, 1, item.trim()); //trims the spaces before and after each full name
+              if (item.includes(",")) {
+                //if last name comes first with a comma
+                let user = item.trim().split(/,/); //split user by comma
+                let firstname = user[1].trim(); //first name is everything after the comma
+                let lastname = user[0].trim(); //last name is first item in array
+                splitusers.push({ first_name: firstname, last_name: lastname }); // push user object into array
+              } else {
+                let user = item.trim().split(/ +/); //split names by one or more space
+                let firstname;
+                if (user.length > 2) {
+                  //if user length is more than 2 then there are middle names
+                  firstname = user.slice(0, user.length - 1).join(" "); // add middle names to first name field
+                } else {
+                  firstname = user[0]; // no middle names to first element is first name
+                }
+                let lastname = user.length > 1 ? user[user.length - 1] : ""; //last name is the last in the array
+                splitusers.push({ first_name: firstname, last_name: lastname }); //push user object into array
+              }
+            }
+          });
+          return splitusers;
+        },
 
-      let userlist = this.names.split("\n"); //splits text area by line
-      userlist.forEach(function(item, index) {
-        if (item != "") {
-          //if each line item isn't blank
-          userlist.splice(index, 1, item.trim()); //trims the spaces before and after each full name
-          if (item.includes(",")) {
-            //if last name comes first with a comma
-            let user = item.trim().split(/,/); //split user by comma
-            let firstname = user[1].trim(); //first name is everything after the comma
-            let lastname = user[0].trim(); //last name is first item in array
-            splitusers.push({ first_name: firstname, last_name: lastname }); // push user object into array
-          } else {
-            let user = item.trim().split(/ +/); //split names by one or more space
-            let firstname;
-            if (user.length > 2) {
-              //if user length is more than 2 then there are middle names
-              firstname = user.slice(0, user.length - 1).join(" "); // add middle names to first name field
-            } else {
-              firstname = user[0]; // no middle names to first element is first name
-            }
-            let lastname = user.length > 1 ? user[user.length - 1] : ""; //last name is the last in the array
-            splitusers.push({ first_name: firstname, last_name: lastname }); //push user object into array
-          }
-        }
-      });
-
-      return splitusers;
-    },
-     
         downCSV: function () {
           let text = this.csvOutput();
           let d = new Date();
@@ -183,7 +186,6 @@
         }
       }
     });
-
     function download(filename, text) {
       var element = document.createElement("a");
       element.setAttribute(
@@ -196,9 +198,7 @@
       element.click();
       document.body.removeChild(element);
     }
-
   </script>
-
 </body>
 
 </html>

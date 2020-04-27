@@ -1,2 +1,1 @@
-# moodletools
- 
+Tool is used for easily generating an upload file for moodle with multiple enrollments for all users.
