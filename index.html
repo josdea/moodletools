@@ -36,14 +36,14 @@
     <hr>
     <div class="row">
       <div class="col-sm-4">
-        <label for="emails">Emails:</label>
+        <label for="emails">Emails:<span v-if="emails.length!=0"> ({{emails.split('\n').length}})</span></label>
         <textarea id="emails" v-model="emails" class="form-control" rows="6"
 placeholder="noreply@demo.com
 noreply2@demo.com
           
 Separate emails with new lines, these will become the usernames as well. 
 Automatically converted to lower case."></textarea>
-        <label for="names">Names:</label>
+        <label for="names">Names:<span v-if="names.length!=0"> ({{names.split('\n').length}})</span></label>
         <textarea id="names" v-model="names" class="form-control" rows="5"
 placeholder="Separate first and last names with a space or comma.
 
@@ -55,12 +55,8 @@ Last Name, First Name"></textarea>
         <label for="password" class="d-block">Password:</label>
         <input id="password" v-model="password" class="w-100" placeholder="password applied to all users">
         <label for="description" class="d-block">Description (optional):</label>
-        <input id="description" v-model="description" class="w-100" placeholder="description pplied to all users">
-
-        <!-- <label for="userids">User Org ID Numbers (optional):</label>
-        <textarea id="userids" class="form-control" rows="5"
-          placeholder="User Org ID go here separated by new lines"></textarea> -->
-        <label for="courseIds">Course Short Names</label>
+        <input id="description" v-model="description" class="w-100" placeholder="description applied to all users">
+        <label for="courseIds">Course Short Names:<span v-if="courses.length!=0"> ({{courses.split('\n').length}})</span></label>
         <textarea id="courseIds" v-model="courses" class="form-control" rows="5"
 placeholder="course1-short-name
 course2-short-name
@@ -117,7 +113,7 @@ Courses to enroll all users, separated on a new line"></textarea>
           let lastName = ""
           csvRow.push("username", "password", "firstname", "lastname", "description", "email")
           
-          if(this.courses != ""){
+          if(this.courses != "" ){
           arrCourseList.forEach((course, indexCourse) => {
             csvRow.push("course" + (indexCourse + 1), "role" + (indexCourse + 1))
           });
@@ -127,7 +123,7 @@ Courses to enroll all users, separated on a new line"></textarea>
           if(this.emails != ""){
           arrEmails.forEach((email, indexEmail) => {
             if(this.names != ""){
-            if (this.capitalFirstLetter === true) {
+            if (this.capitalFirstLetter === true ) {
               firstName = arrUserList[indexEmail].first_name
               firstName = firstName[0].toUpperCase() + firstName.slice(1)
               lastName = arrUserList[indexEmail].last_name
