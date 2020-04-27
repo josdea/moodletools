@@ -122,12 +122,14 @@ Courses to enroll all users, separated on a new line"></textarea>
           csvRow = []
           if(this.emails != ""){
           arrEmails.forEach((email, indexEmail) => {
-            if(this.names != ""){
+            if(arrUserList.length>0){
             if (this.capitalFirstLetter === true ) {
               firstName = arrUserList[indexEmail].first_name
-              firstName = firstName[0].toUpperCase() + firstName.slice(1)
               lastName = arrUserList[indexEmail].last_name
+              if(firstName.length>0 && lastName.length>0){
+              firstName = firstName[0].toUpperCase() + firstName.slice(1)
               lastName = lastName[0].toUpperCase() + lastName.slice(1)
+              }
             } else {
               firstName = arrUserList[indexEmail].first_name
               lastName = arrUserList[indexEmail].last_name
