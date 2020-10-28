@@ -167,9 +167,11 @@ Courses to enroll all users, separated on a new line"></textarea>
                 splitusers.push({ first_name: firstname, last_name: lastname }); // push user object into array
               } else {
                 let user = item.trim().split(/ +/); //split names by one or more space
+                console.log(user)
                 let firstname;
                 if (user.length > 2) {
                   //if user length is more than 2 then there are middle names
+                  //TODO make other middle names capitalized if capitalFirstLetter true
                   firstname = user.slice(0, user.length - 1).join(" "); // add middle names to first name field
                 } else {
                   firstname = user[0]; // no middle names to first element is first name
