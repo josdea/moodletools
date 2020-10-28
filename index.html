@@ -49,7 +49,10 @@ placeholder="Separate first and last names with a space or comma.
 
 First name Last Name
 Last Name, First Name"></textarea>
-         <input type="checkbox" id="capital" v-model="capitalFirstLetter">
+         <input type="checkbox" id="lower" v-model="namesToLowerCase">
+        <label for="lower">Convert names to lower case</label>
+        <br>
+        <input type="checkbox" id="capital" v-model="capitalFirstLetter">
         <label for="capital">Capitalize First Letter of first and last name</label>
         <hr>
         <label for="password" class="d-block">Password:</label>
@@ -84,7 +87,8 @@ Courses to enroll all users, separated on a new line"></textarea>
         description: "",
         role: "",
         courses: "",
-        capitalFirstLetter: true
+        capitalFirstLetter: true,
+        namesToLowerCase: true
       },
       computed: {
         csvOutput: function () {
@@ -146,7 +150,11 @@ Courses to enroll all users, separated on a new line"></textarea>
         },
         userList: function () {
           let splitusers = [];
-          let userlist = this.names.split("\n"); //splits text area by line
+          let strUserlist = this.names
+          if (this.namesToLowerCase == true) {
+            strUserlist = strUserlist.toLowerCase()
+          }
+          let userlist = strUserlist.split("\n"); //splits text area by line
           userlist.forEach(function (item, index) {
             if (item != "") {
               //if each line item isn't blank
@@ -186,7 +194,7 @@ Courses to enroll all users, separated on a new line"></textarea>
       var element = document.createElement("a");
       element.setAttribute(
         "href",
-        "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+        "data:text/plain;charset=UTF-8," + encodeURIComponent(text)
       );
       element.setAttribute("download", filename);
       element.style.display = "none";
